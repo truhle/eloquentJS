@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Chapter 15b</title>
+  <script src="code/chapter/15_game.js"></script>
+  <script src="code/game_levels.js"></script>
+
+  <link rel="stylesheet" href="css/game.css">
+</head>
+<body>
+  <script>
+  // an implementation of runLevel that incorporates pausing with the ESC key
+
+  function runLevel(level, Display, andThen) {
+    var display = new Display(document.body, level);
+    var pause = false;
+    addEventListener("keydown", function(event) {
+      if (event.keyCode == 27) {
+        if (pause == false) {
+          pause = true;
+        }
+        else if (pause == true) {
+          pause = false;
+          runAnimation(frameFun);
+        }
+        event.preventDefault();
+      }
+    });
+    var frameFun = function(step) {
+      if (pause == true) {
+        return false;
+      }
+      level.animate(step, arrows);
+      display.drawFrame(step);
+      if (level.isFinished()) {
+        display.clear();
+        if (andThen)
+          andThen(level.status);
+        return false;
+      }
+    }
+    runAnimation(frameFun);
+  }
+  runGame(GAME_LEVELS, DOMDisplay);
+</script>
+</body>
+</html>

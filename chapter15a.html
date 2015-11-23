@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Chapter 15a</title>
+  <script src="code/chapter/15_game.js"></script>
+  <script src="code/game_levels.js"></script>
+  <link rel="stylesheet" href="css/game.css">
+</head>
+<body>
+  <script>
+  // An implementation of runGame that tracks lives and restarts when a player runs out
+  function runGame(plans, Display) {
+    var lives = 3;
+    function startLevel(n) {
+      runLevel(new Level(plans[n]), Display, function(status) {
+        if (status == "lost") {
+          lives--;
+          if (lives > 0)
+            startLevel(n);
+          else {
+            console.log("Game Over");
+            runGame(plans, Display);
+          }
+        }
+        else if (n < plans.length - 1)
+          startLevel(n + 1);
+        else
+          console.log("You win!");
+      });
+    }
+    startLevel(0);
+  }
+  runGame(GAME_LEVELS, DOMDisplay);
+  </script>
+</body>
+</html>
