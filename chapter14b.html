@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>chapter14b</title>
+
+  <style type="text/css">
+    .trail { /* className for the trail elements */
+      position: absolute;
+      height: 6px; width: 6px;
+      border-radius: 3px;
+      background: teal;
+    }
+    body {
+      height: 300px;
+    }
+  </style>  
+</head>
+<body>
+  <script type="text/javascript">
+    // Creating a window where a trail of teal dots follows the mouse cursor
+    var trail = (function() {
+      var array = [];
+      for (var i = 0; i < 30; i++) {
+        var spot = document.createElement("div");
+        spot.className = "trail";
+        array[i] = spot;
+      }
+      return array;
+    })();
+    console.log(trail);
+    var lastX;
+    var lastY;
+    var trailIndex = 0;
+    addEventListener("mousemove", function(event) {
+      // console.log('move');
+      lastX = event.pageX;
+      lastY = event.pageY;
+      var spot = trail[trailIndex];
+      spot.style.left = (lastX - 3) + "px"
+      spot.style.top = (lastY - 3) + "px";
+      document.body.appendChild(spot);
+      trailIndex++;
+      if (trailIndex == 30)
+        trailIndex = 0;
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>chapter 14</title>
+</head>
+<body>
+  <input type="text">
+
+  <script type="text/javascript">
+    // Creating a text field that one cannot type "Q", "W", or "X" into
+    var field = document.querySelector("input");
+    addEventListener("keydown", function(event) {
+    var key = event.keyCode;
+    if (key == 81 || key == 87 || key == 88)
+      event.preventDefault();
+    });
+  </script>
+</body>
+</html>

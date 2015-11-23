@@ -137,3 +137,7 @@ function deepEqual(a, b) {
     }
     return aProps === bProps;
 }
+
+var a = [1,2,3];
+var l = arrayToList(a);
+console.log(l);

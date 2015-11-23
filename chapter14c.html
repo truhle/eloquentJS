@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>chapter14c</title>
+</head>
+<body>
+
+  <div id="wrapper">
+    <p></p>
+    <div data-tabname="one">Tab one</div>
+    <div data-tabname="two">Tab two</div>
+    <div data-tabname="three">Tab three</div>
+  </div>
+
+  <script type="text/javascript">
+  // A page with a simple tabbed interface
+    function asTabs(node) {
+      var tabs = Array.prototype.slice.call(node.querySelectorAll("div"), 0);
+      var para = node.querySelector("p");
+      var buttons = [];
+      tabs.forEach(function(tab) {
+        tab.style.display = "none";
+        var text = tab.getAttribute("data-tabname");
+        var button = document.createElement("button");
+        button.textContent = text;
+        para.appendChild(button);
+        button.addEventListener("click", function(event) {
+          tabs.forEach(function(tab) {
+            if (tab.style.display == "block")
+              tab.style.display = "none";
+          });
+          tab.style.display = "block";
+          buttons.forEach(function(button) {
+            if (button.style.color != "black")
+              button.style.color = "black";
+              button.style.fontWeight = "normal";
+          });
+          button.style.color = "cornflowerblue";
+          button.style.fontWeight = "bolder";
+        });
+        buttons.push(button);
+      });
+
+    }
+    asTabs(document.querySelector("#wrapper"));
+  </script>
+</body>
+</html>

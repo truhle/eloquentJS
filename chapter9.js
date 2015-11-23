@@ -57,7 +57,7 @@ console.log(text.replace(regex, function(str) {
 
 var number = /^[+-]?\d+?\.?\d*?e?-?\d*?$|^[+-]?\d*?\.?\d+?(e[+-]?\d+)?$/i;
 
-/* The solution from the EJ website:
+/* The solution from the EloquentJS website:
 var number = /^(\+|-|)(\d+(\.\d*)?|\.\d+)([eE](\+|-|)\d+)?$/; */
 
 // Tests:

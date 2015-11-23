@@ -41,34 +41,3 @@ function byTagName(node, tagName) {
   });
   return nodes;
 }
-
-//An animation of a cat and a hat on opposite sides of a ellipse
-
-<!doctype html>
-<script src="code/mountains.js"></script>
-<script src="code/chapter/13_dom.js"></script>
-
-<img src="img/cat.png" id="cat" style="position: absolute">
-<img src="img/hat.png" id="hat" style="position: absolute">
-
-<body style="min-height: 300px">
-<script>
-  var cat = document.querySelector("#cat");
-  var hat = document.querySelector("#hat");
-  var catAngle = 0, hatAngle = 3.14, lastTime = null;
-  function animate(time) {
-    if (lastTime != null) {
-      var addAngle = (time - lastTime) * 0.001;
-      catAngle += addAngle;
-      hatAngle += addAngle;
-    }
-    lastTime = time;
-    cat.style.top = ((Math.sin(catAngle) * 70) + 150) + "px";
-    cat.style.left = ((Math.cos(catAngle) * 200) + 250) + "px";
-    hat.style.top = ((Math.sin(hatAngle) * 70) + 150) + "px";
-    hat.style.left = ((Math.cos(hatAngle) * 200) + 250) + "px";
-    requestAnimationFrame(animate);
-  }
-  requestAnimationFrame(animate);
-</script>
-</body>
