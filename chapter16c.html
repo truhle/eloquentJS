@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Chapter 16c</title>
+</head>
+<body>
+  <canvas width="400" height="400"></canvas>
+<script>
+  var cx = document.querySelector("canvas").getContext("2d");
+  cx.lineWidth = 10;
+  cx.fillStyle = "slateblue";
+
+  var lastTime = null;
+  function frame(time) {
+    if (lastTime != null)
+      updateAnimation(Math.min(100, time - lastTime) / 1000);
+    lastTime = time;
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+
+  var ballPositionX = 150, ballPositionY = 100;
+  var YballSpeed = 200;
+  var XballSpeed = 150;
+  var ballRadius = 20;
+  function updateAnimation(step) {
+    cx.clearRect(25, 25, 350, 350);
+    cx.strokeRect(25, 25, 350, 350);
+    ballPositionX += XballSpeed * step;
+    ballPositionY += YballSpeed * step;
+    if (ballPositionX - ballRadius <= 25 + cx.lineWidth / 2
+        || ballPositionX + ballRadius >= 375 - cx.lineWidth / 2)
+      XballSpeed = -XballSpeed;
+    if (ballPositionY - ballRadius <= 25 + cx.lineWidth / 2
+        || ballPositionY + ballRadius >= 375 - cx.lineWidth / 2)
+      YballSpeed = -YballSpeed;
+    cx.beginPath();
+    cx.arc(ballPositionX, ballPositionY, ballRadius, 0, 6.28);
+    cx.fill();
+  }
+</script>
+</body>
+</html>

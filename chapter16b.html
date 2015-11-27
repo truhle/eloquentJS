@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Chapter 16b</title>
+</head>
+<body>
+  <canvas width="600" height="300"></canvas>
+<script>
+  // a function that draws a labeled pie graph from an array of result objects
+
+  var results = [
+    {name: "Satisfied", count: 1043, color: "lightblue"},
+    {name: "Neutral", count: 563, color: "lightgreen"},
+    {name: "Unsatisfied", count: 510, color: "pink"},
+    {name: "No comment", count: 175, color: "silver"},
+  ]
+  var cx = document.querySelector("canvas").getContext("2d");
+  var total = results.reduce(function(sum, choice) {
+    return sum + choice.count;
+  }, 0);
+
+  var currentAngle = -0.5 * Math.PI;
+  var centerX = 300, centerY = 150;
+  var textX = 0, textY = 0; textAngle = 0;
+  results.forEach(function(result) {
+    var sliceAngle = (result.count / total) * 2 * Math.PI;
+    cx.beginPath();
+    cx.arc(centerX, centerY, 100,
+           currentAngle, currentAngle + sliceAngle);
+    textAngle = currentAngle + (sliceAngle / 2);
+    textX = (Math.cos(textAngle) * 115) + centerX;
+    textY = (Math.sin(textAngle) * 115) + centerY;
+    if (textAngle > 0.5 * Math.PI)
+      cx.textAlign = "end";
+    if (textAngle > 0 && textAngle < Math.PI)
+      cx.textBaseline = "top";
+    else if (cx.textBaseline == "top")
+      cx.textBaseline = "bottom";
+    cx.font = "15px Arial";
+    cx.fillStyle = result.color;
+    cx.fillText(result.name, textX, textY);
+    cx.lineTo(centerX, centerY);
+    cx.fill();
+    currentAngle += sliceAngle;
+  });
+</script>
+</body>
+</html>

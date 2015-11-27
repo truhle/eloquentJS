@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Chapter 16a</title>
+</head>
+<body>
+  <canvas width="600" height="200"></canvas>
+  <script>
+    var cx = document.querySelector("canvas").getContext("2d");
+
+    // A series of configurable functions to draw various shapes
+
+    function trapezoid(bottomLeftX, bottomRightX, topLeftX, topRightX, topY, bottomY) {
+      cx.beginPath();
+      cx.moveTo(bottomLeftX, bottomY);
+      cx.lineTo(topLeftX, topY);
+      cx.lineTo(topRightX, topY);
+      cx.lineTo(bottomRightX, bottomY);
+      cx.closePath();
+      cx.stroke();
+    }
+    trapezoid(//Bottom-left x, Bottom-right x
+              20, 120,
+              //Top-left x, Top-right x
+              50, 90,
+              //Top-y, Bottom-y
+              75, 125);
+
+    function diamond(centerX, centerY, sideLength, color) {
+      cx.save();
+      cx.translate(centerX, centerY);
+      cx.rotate(Math.PI / 4);
+      var beginX = beginY = -sideLength / 2;
+      cx.beginPath();
+      cx.moveTo(beginX, beginY);
+      cx.lineTo(beginX + sideLength, beginY);
+      cx.lineTo(beginX + sideLength, beginY + sideLength);
+      cx.lineTo(beginX, beginY + sideLength);
+      cx.fillStyle = color;
+      cx.fill();
+      cx.restore();
+    }
+
+    diamond(// centerX, center Y
+            170, 100,
+            // sideLength, color
+            60, "red")
+
+    function zigZag(startX, startY, xLength, yZag, repetitions) {
+      cx.beginPath();
+      cx.moveTo(startX, startY);
+      var endX = startX + xLength;
+      var direction = "right";
+      for (var i = 1; i <= repetitions; i++) {
+        var zag = i * yZag;
+        if (direction == "right") {
+          cx.lineTo(endX, startY + zag);
+          direction = "left";
+        } else {
+          cx.lineTo(startX, startY + zag);
+          direction = "right"
+        }
+      }
+      cx.stroke();
+    }
+
+    zigZag(// startX, startY
+           230, 50,
+           //xLength, yZag, repetitions
+           90, 8, 12);
+
+    // A version of the straightLineSpiral that creates more of an exponentially widening straightLineSpiral
+
+    // function straightLineSpiral(startX, startY, lineLength, numLines, initAngle, factor) {
+    //   cx.save();
+    //   cx.translate(startX, startY);
+    //   cx.beginPath();
+    //   var angle = initAngle;
+    //   for (var i = 0; i < numLines; i++) {
+    //     cx.rotate(angle);
+    //     cx.lineTo(0, lineLength);
+    //     angle = angle * (factor + (0.0001 * i));
+    //     cx.translate(0, lineLength);
+    //   }
+    //   cx.stroke();
+    //   cx.restore()
+    // }
+    //
+    // straightLineSpiral(//startX, startY
+    //                    400, 100,
+    //                    //lineLength, numLines
+    //                    5, 100,
+    //                    //initAngle, factor
+    //                    .85, 0.975);
+
+    function straightLineSpiral(centerX, centerY, radius, numLoops, numSegments) {
+      cx.save();
+      cx.translate(centerX, centerY);
+      var radiusIncrement = radius / numSegments;
+      var angleIncrement = numLoops * 2 * Math.PI / numSegments;
+      var x = 0, y = 0, radius = 0;
+      cx.beginPath();
+      for (var i = 1; i <= numSegments; i++) {
+        radius = radiusIncrement * i;
+        x = Math.cos(angleIncrement * i) * radius;
+        y = Math.sin(angleIncrement * i) * radius;
+        cx.lineTo(x, y);
+      }
+      cx.stroke();
+      cx.restore();
+    }
+
+    straightLineSpiral(//centerX, centerY, radius
+                       385, 100, 50,
+                       //numLoops, numSegments
+                       3.1, 100)
+
+    function star(centerX, centerY, radius, numPoints, color) {
+      cx.save();
+      cx.translate(centerX, centerY);
+      var angleIncrement = 2 * Math.PI / numPoints;
+      var angle = 0;
+      cx.beginPath();
+      cx.moveTo(radius, 0);
+      var x = 0, y = 0;
+      for (var i = 1; i <= numPoints; i++) {
+        angle = angleIncrement * i;
+        x = Math.cos(angle) * radius;
+        y = Math.sin(angle) * radius;
+        cx.quadraticCurveTo(0, 0, x, y);
+      }
+      cx.fillStyle = color;
+      cx.fill();
+      cx.restore();
+    }
+
+    star(//centerX, centerY
+         500, 100,
+         //radius, numPoints, color
+         60, 40, "gold");
+
+  </script>
+</body>
+</html>
