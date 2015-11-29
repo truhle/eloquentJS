@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Chapter 18c</title>
+</head>
+<body>
+  <div id="grid"></div>
+<button id="next">Next generation</button>
+<button id="auto">Auto run</button>
+
+<script>
+  //A simulation of Conway's Game of Life using checkboxes
+  var grid = [];
+  function generateGrid(size, density) {
+    for (var y = 0; y < size; y++) {
+      var newLine = [];
+      for (var x = 0; x < size; x++) {
+        var newCheckbox = document.createElement("input");
+        newCheckbox.setAttribute("type", "checkbox");
+        newCheckbox.setAttribute("id", x + "by" + y);
+        if (Math.random() < density)
+          newCheckbox.checked = true;
+        newLine.push(newCheckbox);
+      }
+      grid.push(newLine);
+    }
+  }
+
+  generateGrid(30, 0.35);
+
+  var gridDisplay = document.querySelector("#grid");
+
+  function updateGridDisplay() {
+    gridDisplay.innerHTML = "";
+    grid.forEach(function(line) {
+      var lineDisplay = document.createElement("div");
+      line.forEach(function(box) {
+        lineDisplay.appendChild(box);
+      });
+      gridDisplay.appendChild(lineDisplay);
+    });
+  }
+
+  updateGridDisplay();
+
+  function readGridDisplay() {
+    var lines = Array.prototype.slice.call(gridDisplay.childNodes, 0);
+    lines.forEach(function(line) {
+      var boxes = Array.prototype.slice.call(line.childNodes, 0);
+      boxes.forEach(function(box) {
+        var id = box.getAttribute("id");
+        var x = parseInt(id);
+        var yMatch = /(\d+)$/.exec(id);
+        var y = yMatch[1];
+        grid[y][x].checked = box.checked;
+      });
+    });
+  }
+
+  function nextGeneration() {
+    readGridDisplay();
+
+    var neighborCounts = [];
+
+    grid.forEach(function(line, y) {
+      var newCountLine = [];
+      line.forEach(function(box, x) {
+        var checkedNeighbors = 0;
+        for (var yInterval = -1; yInterval < 2; yInterval++) {
+          for (var xInterval = -1; xInterval < 2; xInterval++) {
+            var newX = x + xInterval;
+            var newY = y + yInterval;
+            var size = line.length;
+            if (newX >= 0 && newX < size && newY >= 0 && newY < size) {
+              if (grid[newY][newX] !== box && grid[newY][newX].checked == true)
+                checkedNeighbors++
+            }
+          }
+        }
+        newCountLine.push(checkedNeighbors);
+      });
+      neighborCounts.push(newCountLine);
+    });
+
+    grid.forEach(function(line, y) {
+      line.forEach(function(box, x) {
+        var checkedNeighbors = neighborCounts[y][x];
+        if (checkedNeighbors > 3 || checkedNeighbors < 2)
+          box.checked = false;
+        else if (checkedNeighbors == 3)
+          box.checked = true;
+      });
+    });
+
+    updateGridDisplay();
+  }
+
+  document.querySelector("#next").addEventListener("click", nextGeneration);
+
+  var autorun = null;
+  document.querySelector("#auto").addEventListener("click", function() {
+    if (autorun) {
+      clearInterval(autorun);
+      autorun = null;
+    } else {
+      autorun = setInterval(nextGeneration, 350);
+    }
+  });
+</script>
+</body>
+</html>

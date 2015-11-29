@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Chapter 18a</title>
+</head>
+<body>
+  <!doctype html>
+<script src="http://eloquentjavascript.net/code/promise.js"></script>
+
+<textarea id="code">return "hi";</textarea>
+<button id="button">Run</button>
+<pre id="output"></pre>
+
+<script>
+  // a simple Javascript workbench
+  var codeInput = document.querySelector("#code");
+  var code = "";
+  var runButton = document.querySelector("#button");
+  runButton.addEventListener("click", function() {
+    code = codeInput.value;
+    var resultDisplay = document.querySelector("#output");
+    try {
+      var func = new Function("", code);
+      var output = String(func());
+      resultDisplay.textContent = output;
+    } catch (e) {
+      resultDisplay.textContent = e;
+    }
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Chapter 18b</title>
+</head>
+<body>
+<input type="text" id="field">
+<div id="suggestions" style="cursor: pointer"></div>
+
+<script>
+  // A basic autocomplete function.  Provides clickable
+  // suggestions generated from a list according to what is
+  // typed, which can complete a text box.
+
+  // Builds up an array with global variable names, like
+  // 'alert', 'document', and 'scrollTo'
+  var terms = [];
+  for (var name in window)
+    terms.push(name);
+
+  var suggestionField = document.getElementById("suggestions");
+
+  var textField = document.getElementById("field");
+  textField.addEventListener("input", function(event) {
+    var text = textField.value;
+    suggestionField.innerHTML = "";
+    terms.forEach(function(term) {
+      if (text == term.slice(0, text.length)) {
+        var suggestion = document.createElement("div");
+        suggestion.innerHTML = term;
+        suggestion.addEventListener("click", function() {
+          textField.value = term;
+        });
+        suggestionField.appendChild(suggestion);
+      }
+    });
+  });
+</script>
+</body>
+</html>
