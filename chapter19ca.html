@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Chapter 19ca</title>
+  <script src="http://eloquentjavascript.net/code/chapter/19_paint.js"></script>
+
+  <script>
+    // An initial implementation of a flood fill tool, capable of handling small areas
+
+    tools["Flood fill"] = function(event, cx) {
+      var width = cx.canvas.width;
+      var height = cx.canvas.height;
+      try {
+        var prePixels = cx.getImageData(0, 0, width, height).data;
+        var pixels = Array.prototype.slice.call(prePixels, 0);
+      } catch (e) {
+        if (e instanceof SecurityError)
+          alert("Can't access image data: " + e.toString());
+        else
+          throw e;
+      }
+
+      function colorFromLocation(loc) {
+        var first = (loc[0] + loc[1] * width) * 4;
+        var pixel = pixels.slice(first, first + 4);
+        return pixel.join(",");
+      }
+
+      var pos = relativePos(event, cx.canvas);
+      var matchColor = colorFromLocation([pos.x, pos.y]);
+      var seenPixels = [];
+      var unwalkedPixels = [];
+
+      function aryIncludesAry(arrayOfArrays, array) {
+        var aryString = array.join(",");
+        for (var i = 0; i < arrayOfArrays.length; i++) {
+          if (arrayOfArrays[i].join(",") == aryString)
+            return true;
+        }
+        return false;
+      }
+
+      function eligibleNeighbors(location) {
+        var eligibleNeighbors = [];
+        for (var xOffset = -1; xOffset <= 1; xOffset += 2) {
+          var neighbor = [location[0] + xOffset, location[1]];
+          if (!aryIncludesAry(seenPixels, neighbor) && neighbor[0] <= width && neighbor[0] >= 0 && colorFromLocation(neighbor) == matchColor) {
+            eligibleNeighbors.push(neighbor);
+            unwalkedPixels.push(neighbor);
+          }
+        }
+        for (var yOffset = -1; yOffset <= 1; yOffset += 2) {
+          var neighbor = [location[0], location[1] + yOffset];
+          if (!aryIncludesAry(seenPixels, neighbor) && neighbor[1] <= height && neighbor[1] >= 0 && colorFromLocation(neighbor) == matchColor) {
+            eligibleNeighbors.push(neighbor);
+            unwalkedPixels.push(neighbor);
+          }
+        }
+        return eligibleNeighbors;
+      }
+
+      function walk(location) {
+        var neighbors = eligibleNeighbors(location);
+        if (neighbors.length == 0) {
+          if (unwalkedPixels.length != 0)
+            walk(unwalkedPixels.pop())
+          else
+            return;
+        }
+        for (var n = 0; n < neighbors.length; n++) {
+          cx.fillRect(neighbors[n][0], neighbors[n][1], 1, 1);
+          seenPixels.push(neighbors[n]);
+        }
+        if (unwalkedPixels.length != 0)
+          walk(unwalkedPixels.pop());
+      }
+
+      walk([pos.x, pos.y]);
+
+    };
+  </script>
+
+  <link rel="stylesheet" href="http://eloquentjavascript.net/css/paint.css">
+</head>
+<body>
+  <script>createPaint(document.body);</script>
+</body>
+</html>

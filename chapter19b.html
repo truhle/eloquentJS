@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Chapter 19b</title>
+  <script src="http://eloquentjavascript.net/code/chapter/19_paint.js"></script>
+
+  <script>
+    // a tool to grab a color to use by clicking on an existing color in the canvas
+
+    tools["Pick color"] = function(event, cx) {
+      var pos = relativePos(event, cx.canvas);
+      try {
+        var data = cx.getImageData(pos.x, pos.y, 1, 1).data;
+      } catch (e) {
+        if (e instanceof SecurityError)
+          alert("Can't grab: " + e.toString());
+          return;
+        else
+          throw e;
+      }
+      var rgbColor = "rgb(" + data[0] + ", " + data[1] + ", " + data[2] + ")";
+      cx.fillStyle = rgbColor;
+      cx.strokeStyle = rgbColor;
+    };
+  </script>
+
+  <link rel="stylesheet" href="http://eloquentjavascript.net/css/paint.css">
+</head>
+<body>
+  <script>createPaint(document.body);</script>
+</body>
+</html>

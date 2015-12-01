@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Chapter 19cb</title>
+  <script src="http://eloquentjavascript.net/code/chapter/19_paint.js"></script>
+
+  <script>
+    // A much faster implementation of a flood fill tool using
+    // arrays of strings to store location and pixel rgba(color) values
+    // and a true/null array of seenPixel locations
+    // accessible by an index generates by x, y coordinates
+
+    tools["Flood fill"] = function(event, cx) {
+      var width = cx.canvas.width;
+      var height = cx.canvas.height;
+      try {
+        var quasiPixels = cx.getImageData(0, 0, width, height).data;
+      } catch (e) {
+        if (e instanceof SecurityError)
+          alert("Can't access image data: " + e.toString());
+        else
+          throw e;
+      }
+      var pixels = Array.prototype.slice.call(quasiPixels, 0);
+      var pixelStrings = [];
+      for (var i = 0; i < pixels.length; i += 4) {
+        var values = [];
+        for (var j = i; j < i + 4; j++) {
+          values.push(pixels[j]);
+        }
+        pixelStrings.push(values.join(","));
+      }
+
+      function colorFromLocation(x, y) {
+        var index = (x + y * width);
+        var pixel = pixelStrings[index];
+        return pixel;
+      }
+
+      var pos = relativePos(event, cx.canvas);
+      var matchColor = colorFromLocation(pos.x, pos.y);
+      var seenPixels = new Array(width * height);
+      var unwalkedPixels = [pos.x + "," + pos.y];
+
+      function eligibleNeighbors(location) {
+        var eligibleNeighbors = [];
+        var locationAry = location.split(",");
+        var locationX = Number(locationAry[0]);
+        var locationY = Number(locationAry[1]);
+        for (var xOffset = -1; xOffset <= 1; xOffset += 2) {
+          var xCoordinate = locationX + xOffset;
+          if (xCoordinate <= width && xCoordinate >= 0) {
+            var neighbor = xCoordinate + "," + locationY;
+            var neighborIndex = xCoordinate + locationY * width;
+            if (!seenPixels[neighborIndex] && colorFromLocation(xCoordinate, locationY) == matchColor) {
+              eligibleNeighbors.push(neighbor);
+              unwalkedPixels.push(neighbor);
+            }
+          }
+        }
+        for (var yOffset = -1; yOffset <= 1; yOffset += 2) {
+          var yCoordinate = locationY + yOffset;
+          if (yCoordinate <= height && yCoordinate >= 0) {
+            var neighbor = locationX + "," + yCoordinate;
+            var neighborIndex = locationX + yCoordinate * width;
+            if (!seenPixels[neighborIndex] && colorFromLocation(locationX, yCoordinate) == matchColor) {
+              eligibleNeighbors.push(neighbor);
+              unwalkedPixels.push(neighbor);
+            }
+          }
+        }
+        return eligibleNeighbors;
+      }
+
+      // This recursive approach works fine for smaller areas, but hangs on larger areas.
+
+      // function walk(location) {
+      //   var neighbors = eligibleNeighbors(location);
+      //   if (neighbors.length == 0) {
+      //     if (unwalkedPixels.length != 0)
+      //       walk(unwalkedPixels.pop())
+      //     else
+      //       return;
+      //   }
+      //   for (var n = 0; n < neighbors.length; n++) {
+      //     var neighbor = neighbors[n].split(",");
+      //     var neighborIndex = Number(neighbor[0]) + Number(neighbor[1]) * width;
+      //     cx.fillRect(neighbor[0], neighbor[1], 1, 1);
+      //     seenPixels[neighborIndex] = true;
+      //   }
+      //   if (unwalkedPixels.length != 0)
+      //     walk(unwalkedPixels.pop());
+      // }
+
+      // This while loop approach has no such limitation
+
+      function walk() {
+        while (unwalkedPixels.length != 0) {
+          var neighbors = eligibleNeighbors(unwalkedPixels.pop());
+          for (var n = 0; n < neighbors.length; n++) {
+            var neighbor = neighbors[n].split(",");
+            var neighborIndex = Number(neighbor[0]) + Number(neighbor[1]) * width;
+            cx.fillRect(neighbor[0], neighbor[1], 1, 1);
+            seenPixels[neighborIndex] = true;
+          }
+        }
+      }
+
+      walk();
+
+    };
+  </script>
+
+  <link rel="stylesheet" href="http://eloquentjavascript.net/css/paint.css">
+</head>
+<body>
+  <script>createPaint(document.body);</script>
+</body>
+</html>

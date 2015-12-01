@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Chapter 19a</title>
+  <script src="http://eloquentjavascript.net/code/chapter/19_paint.js"></script>
+
+<script>
+  //A rectangle drawing tool for the eloquentjavascript paint program
+  tools.Rectangle = function(event, cx) {
+    var relativeStartPos = relativePos(event, cx.canvas);
+    var startX = event.pageX;
+    var startY = event.pageY;
+    var tracker = document.createElement("div");
+    tracker.style.position = "absolute";
+    tracker.style.border = "1px dashed " + cx.fillStyle;
+    // tracker.style.background = cx.fillStyle;
+    document.body.appendChild(tracker);
+    trackDrag(function(event) {
+      var left = Math.min(startX, event.pageX);
+      var top = Math.min(startY, event.pageY);
+      var width = Math.abs(startX - event.pageX);
+      var height = Math.abs(startY - event.pageY);
+      tracker.style.left = left + "px";
+      tracker.style.top = top + "px";
+      tracker.style.width = width + "px";
+      tracker.style.height = height + "px";
+    },
+    function(event) {
+      var relativeEndPos = relativePos(event, cx.canvas);
+      var left = Math.min(relativeStartPos.x, relativeEndPos.x);
+      var top = Math.min(relativeStartPos.y, relativeEndPos.y);
+      var width = Math.abs(relativeStartPos.x - relativeEndPos.x);
+      var height = Math.abs(relativeStartPos.y - relativeEndPos.y);
+      cx.fillRect(left, top, width, height);
+      document.body.removeChild(tracker);
+    });
+  };
+</script>
+
+<link rel="stylesheet" href="http://eloquentjavascript.net/css/paint.css">
+</head>
+<body>
+  <script>createPaint(document.body);</script>
+</body>
+</html>
