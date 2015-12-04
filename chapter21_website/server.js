@@ -36,7 +36,7 @@ router.add("GET", /^\/talks\/([^\/]+)$/,
 });
 
 router.add("DELETE", /^\/talks\/([^\/]+)$/,
-           function(request, response, tite) {
+           function(request, response, title) {
   if (title in talks) {
     delete talks[title];
     registerChange(title);

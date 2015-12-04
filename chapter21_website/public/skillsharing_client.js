@@ -1,4 +1,4 @@
-function request(option, callback) {
+function request(options, callback) {
   var req = new XMLHttpRequest();
   req.open(options.method || "GET", options.pathname, true);
   req.addEventListener("load", function() {
@@ -31,8 +31,6 @@ function reportError(error) {
     alert(error.toString());
 }
 
-// Displaying Talks
-
 var talkDiv = document.querySelector("#talks");
 var shownTalks = Object.create(null);
 
@@ -58,7 +56,7 @@ function displayTalks(talks) {
 function instantiateTemplate(name, values) {
   function instantiateText(text) {
     return text.replace(/\{\{(\w+)\}\}/g, function(_, name) {
-      return values.name;
+      return values[name];
     });
   }
   function instantiate(node) {
@@ -70,6 +68,8 @@ function instantiateTemplate(name, values) {
     } else if (node.nodeType == document.TEXT_NODE) {
       return document.createTextNode(
                instantiateText(node.nodeValue));
+    } else {
+      return node;
     }
   }
 
@@ -95,4 +95,57 @@ function drawTalk(talk) {
     form.reset();
   });
   return node;
+}
+
+function talkURL(title) {
+  return "talks/" + encodeURIComponent(title);
+}
+
+function deleteTalk(title) {
+  request({pathname: talkURL(title), method: "DELETE"},
+          reportError);
+}
+
+function addComment(title, comment) {
+  var comment = {author: nameField.value, message: comment};
+  request({pathname: talkURL(title) + "/comments",
+           body: JSON.stringify(comment),
+           method: "POST"},
+          reportError);
+}
+
+var nameField = document.querySelector("#name");
+
+nameField.value = localStorage.getItem("name") || "";
+
+nameField.addEventListener("change", function() {
+  localStorage.setItem("name", nameField.value);
+});
+
+var talkForm = document.querySelector("#newtalk");
+
+talkForm.addEventListener("submit", function(event) {
+  event.preventDefault();
+  request({pathname: talkURL(talkForm.elements.title.value),
+           method: "PUT",
+           body: JSON.stringify({
+             presenter: nameField.value,
+             summary: talkForm.elements.summary.value
+           })}, reportError);
+  talkForm.reset();
+});
+
+function waitForChanges() {
+  request({pathname: "talks?changesSince=" + lastServerTime},
+          function(error, response) {
+    if (error) {
+      setTimeout(waitForChanges, 2500);
+      console.error(error.stack);
+    } else {
+      response = JSON.parse(response);
+      displayTalks(response.talks);
+      lastServerTime = response.serverTime;
+      waitForChanges();
+    }
+  });
 }
