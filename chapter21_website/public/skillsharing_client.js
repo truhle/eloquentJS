@@ -62,37 +62,42 @@ function displayTalks(talks) {
   });
 }
 
-function instantiateTemplate(name, values) {
-  function instantiateText(text) {
+function instantiateTemplate(template, values) {
+  function instantiateText(text, values) {
     return text.replace(/\{\{(\w+)\}\}/g, function(_, name) {
       return values[name];
     });
   }
-  function instantiate(node) {
+  function attr(node, attrName) {
+  return node.nodeType == document.ELEMENT_NODE &&
+    node.getAttribute(attrName);
+  }
+  function instantiate(node, values) {
     if (node.nodeType == document.ELEMENT_NODE) {
       var copy = node.cloneNode();
-      for (var i = 0; i < node.childNodes.length; i++)
-        copy.appendChild(instantiate(node.childNodes[i]));
+      for (var i = 0; i < node.childNodes.length; i++) {
+        var child = node.childNodes[i];
+        var repeat = attr(child, "template-repeat");
+        if (repeat) {
+          (values[repeat] || []).forEach(function(element) {
+            copy.appendChild(instantiate(child, element));
+          });
+        } else {
+          copy.appendChild(instantiate(child, values));
+        }
+      }
       return copy;
     } else if (node.nodeType == document.TEXT_NODE) {
-      return document.createTextNode(
-               instantiateText(node.nodeValue));
-    } else {
-      return node;
+        return document.createTextNode(instantiateText(node.nodeValue, values))
     }
   }
 
-  var template = document.querySelector("#template ." + name);
-  return instantiate(template);
+  return instantiate(template, values);
 }
 
 function drawTalk(talk) {
-  var node = instantiateTemplate("talk", talk);
-  var comments = node.querySelector(".comments");
-  talk.comments.forEach(function(comment) {
-    comments.appendChild(
-      instantiateTemplate("comment", comment));
-  });
+  var template = document.querySelector("#template .talk");
+  var node = instantiateTemplate(template, talk);
 
   node.querySelector("button.del").addEventListener(
     "click", deleteTalk.bind(null, talk.title));
