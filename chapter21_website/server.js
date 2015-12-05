@@ -4,6 +4,7 @@
 var http = require("http");
 var Router = require("./router");
 var ecstatic = require("ecstatic");
+var fs = require("fs");
 
 var fileServer = ecstatic({root: "./public"});
 var router = new Router();
@@ -25,7 +26,26 @@ function respondJSON(response, status, data) {
           "application/json");
 }
 
-var talks = Object.create(null);
+// Creating disc persistence for talks
+
+function saveData(file, data) {
+  fs.writeFile(file, JSON.stringify(data),
+               function(err) {
+    if (err)
+      console.log("Failed to save:", err);
+  });
+}
+
+function readData(file) {
+  try {
+    return JSON.parse(fs.readFileSync(file, "utf8"));
+  } catch (e) {
+    return false;
+  }
+}
+
+var talks = readData("talks.json") || Object.create(null);
+
 
 router.add("GET", /^\/talks\/([^\/]+)$/,
            function(request, response, title) {
@@ -39,6 +59,7 @@ router.add("DELETE", /^\/talks\/([^\/]+)$/,
            function(request, response, title) {
   if (title in talks) {
     delete talks[title];
+    saveData("talks.json", talks);
     registerChange(title);
   }
   respond(response, 204, null);
@@ -74,6 +95,7 @@ router.add("PUT", /^\/talks\/([^\/]+)$/,
                       presenter: talk.presenter,
                       summary: talk.summary,
                       comments: []};
+      saveData("talks.json", talks);
       registerChange(title);
       respond(response, 204, null);
     }
@@ -91,6 +113,7 @@ router.add("POST", /^\/talks\/([^\/]+)\/comments$/,
       respond(response, 400, "Bad comment data");
     } else if (title in talks) {
       talks[title].comments.push(comment);
+      saveData("talks.json", talks);
       registerChange(title);
       respond(response, 204, null);
     } else {
@@ -143,10 +166,11 @@ function waitForChanges(since, response) {
   }, 90 * 1000);
 }
 
-var changes = [];
+var changes = readData("changes.json") || [];
 
 function registerChange(title) {
   changes.push({title: title, time: Date.now()});
+  saveData("changes.json", changes);
   waiting.forEach(function(waiter) {
     sendTalks(getChangedTalks(waiter.since), waiter.response);
   });
