@@ -44,10 +44,19 @@ function displayTalks(talks) {
       }
     } else {
       var node = drawTalk(talk);
-      if (shown)
+      if (shown) {
+        // Keep text in comment fields alive in a refresh
+        var newCommentField = node.querySelector("input");
+        var shownCommentField = shown.querySelector("input");
+        var hasFocus = document.activeElement == shownCommentField;
+        newCommentField.value = shownCommentField.value;
+        // Update the talk
         talkDiv.replaceChild(node, shown);
-      else
+        // Maintain focus
+        if (hasFocus) newCommentField.focus();
+      } else {
         talkDiv.appendChild(node);
+      }
       shownTalks[talk.title] = node;
     }
   });
